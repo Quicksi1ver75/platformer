@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -5,17 +6,53 @@ using UnityEngine.InputSystem;
 public class PlayerMotor : MonoBehaviour
 {
     Vector2 direction;
+    Rigidbody2D rigidbody2D;
     public float speed = 10;
+    public float jumpForce = 10;
+    public float maxSpeed = 5;
+    public float stoppingForce = 10;
+    private bool canJump = true;
+   
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
-       
+       rigidbody2D = GetComponent<Rigidbody2D>();   
     }
 
     // Update is called once per frame
-    private void Update()
+    private void FixedUpdate()
     {
-        transform.position += new Vector3(direction.x, direction.y, 0) * Time.deltaTime * speed;
+        HandlePlayerMovement();
+
+        rigidbody2D.AddForce(new Vector2(direction.x * speed, 0));
+
+        MaxSpeedLimiting();
+        //transform.position += new Vector3(direction.x, direction.y, 0) * Time.deltaTime * speed;
+    }
+
+    private void HandlePlayerMovement()
+    {
+        if (direction.x != 0)
+        {
+            rigidbody2D.AddForce(new Vector2(direction.x * speed, 0));
+        }
+        else if (rigidbody2D.linearVelocityX != 0)
+        {
+            //Zatrzymywanie
+            rigidbody2D.AddForce(new Vector2(-rigidbody2D.linearVelocityX * stoppingForce, 0));
+        }
+    }
+
+    private void MaxSpeedLimiting()
+    {
+        if (rigidbody2D.linearVelocityX >= maxSpeed)
+        {
+            rigidbody2D.linearVelocityX = maxSpeed;
+        }
+        else if (rigidbody2D.linearVelocityX <= -maxSpeed)
+        {
+            rigidbody2D.linearVelocityX = -maxSpeed;
+        }
     }
 
     private void OnMove(InputValue value)
@@ -25,4 +62,18 @@ public class PlayerMotor : MonoBehaviour
         direction = value.Get<Vector2>();
        
     }
+    private void OnJump()
+    {
+        if (canJump)
+        {
+            rigidbody2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            canJump = false;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        canJump = true;
+    }
 }
+   
