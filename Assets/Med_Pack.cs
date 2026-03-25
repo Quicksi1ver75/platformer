@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Med_Pack : MonoBehaviour
 {
-    public float heal = 1;
+    public float heal = 2;
 
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
