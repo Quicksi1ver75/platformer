@@ -1,43 +1,82 @@
+
+
 using UnityEngine;
 
-public class health_component : MonoBehaviour
+public class Health_Component : MonoBehaviour
+
 {
+
     private float health = 10;
+
     public float maxHealth = 10;
+
+    public delegate void OnHealthInitializedHandler(float newHealth);
+
+    public delegate void OnHealthChangeHandler(float newHealth, float amountChanged);
+
+    public event OnHealthChangeHandler OnHealthChanged;
+
+    public event OnHealthInitializedHandler OnHealthInitialized;
 
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
+
     {
+
+        OnHealthInitialized?.Invoke(health);
 
     }
 
     // Update is called once per frame
+
     void Update()
+
     {
 
     }
-    public void AddHealth(float healthtoadd)
+
+    public void AddDamage(float damage)
+
     {
-        health += healthtoadd;
+
+        health -= damage;
+
+        //Debug.Log(health);
+
+        if (health <= 0)
+
+        {
+
+            Destroy(gameObject);
+
+        }
+
+        OnHealthChanged?.Invoke(health, damage);
+
+    }
+
+    public void AddHealth(float HealingValue)
+
+    {
+
+        health += HealingValue;
 
         if (health >= maxHealth)
+
         {
+
             health = maxHealth;
-        }
-    }
-    public void AddDamage(float damage)
-    {
-        health -= damage;
-        Debug.Log(health);
-        {
-            if (health <= 0)
-            {
-                Destroy(this.gameObject);
-            }
+
         }
 
+        OnHealthChanged?.Invoke(health, HealingValue);
+
+        Debug.Log(health);
+
     }
-    
+
 }
+
