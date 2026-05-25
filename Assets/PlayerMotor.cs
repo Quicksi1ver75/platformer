@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
+using TMPro;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class PlayerMotor : MonoBehaviour
 {
@@ -13,6 +15,9 @@ public class PlayerMotor : MonoBehaviour
     public float maxSpeed = 5;
     public float stoppingForce = 10;
     public float dashForce = 10;
+    private float initScale;
+    private Rigidbody2D _rigidbody2D;
+    private Animator _animator;
     private bool canJump = true;
     private bool canDash = true;
 
@@ -44,7 +49,12 @@ public class PlayerMotor : MonoBehaviour
     {
         HandlePlayerMovement();
 
-        rigidbody2D.AddForce(new Vector2(direction.x * speed, 0));
+        rigidbody2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        currentJump++;
+        if (currentJump >= maxJump)
+        {
+            canJump = false;
+        }
 
         MaxSpeedLimiting();
         //transform.position += new Vector3(direction.x, direction.y, 0) * Time.deltaTime * speed;
@@ -55,11 +65,17 @@ public class PlayerMotor : MonoBehaviour
         if (direction.x != 0)
         {
             rigidbody2D.AddForce(new Vector2(direction.x * speed, 0));
+            _animator .SetBool("IsMoving", true);
         }
         else if (rigidbody2D.linearVelocityX != 0)
         {
             //Zatrzymywanie
             rigidbody2D.AddForce(new Vector2(-rigidbody2D.linearVelocityX * stoppingForce, 0));
+        }
+        if (direction.x == 0)
+        {
+            _animator.SetBool("IsMoving", false);
+
         }
     }
 
@@ -98,7 +114,8 @@ public class PlayerMotor : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        canJump = true;
+        canJump = true;     
+        _animator.SetBool("canJump", false);
     }
 }
    
