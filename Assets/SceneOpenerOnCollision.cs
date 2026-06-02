@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SceneOpenerOnCollision : MonoBehaviour
 
@@ -11,7 +12,7 @@ public class SceneOpenerOnCollision : MonoBehaviour
 
     {
 
-        //OpenScene(NextLevelName);
+       SceneManager.LoadScene(NextLevelName);
 
     }
 
